@@ -1,0 +1,11 @@
+#local dump one or more collection-
+mongodump --host localhost --port 27017  --db dbname --collection collname -o c:\testarea\localfmdev
+#remote dump-
+mongodump --host hostname --port 27456 --username uname --password Pwd –gzip --db dbname -o c:\testarea\fm --authenticationDatabase admin
+mongodump --host IP --port 27017--username uname --password Pwd -gzip --db dbname -o c:\testarea\fm --authenticationDatabase admin
+
+#Restore one or more collection in localhost-
+mongorestore --host localhost --port 27017  --db fmdevhist --collection FunnelHistories  c:\testarea\localfmdev\fmdev\FunnelHistories.bson
+
+mongorestore --host sww-weis-dev.shell.com:27456 --username uname --password Pwd --authenticationDatabase admin --gzip --db FMUAT "C:\FM_Prod_Bkp08112019\dbname" 
+mongorestore --host localhost --port 27017 --gzip  --db dbname C:\working\Data\dbname
