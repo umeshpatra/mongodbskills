@@ -1,0 +1,7 @@
+# bellow script helps to derive size of each documents in a collection/criteria
+
+db.getCollection('Funnels').find({Name:/ABLTO/}).forEach(function(obj)
+{
+  var size = Object.bsonsize(obj);
+  print('Name:'+ obj.Name + '|| _id: '+obj._id+' || Size: '+size+'B -> '+Math.round(size/(1024))+'KB -> '+Math.round(size/(1024*1024))+'MB (max 16MB)');
+});
