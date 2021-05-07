@@ -1,0 +1,8 @@
+# Bellow is an Javascript example enables Mongodb document processing/manipulation/monitoring
+var printsize= function(obj){
+  var size = Object.bsonsize(obj);
+  print('Name : Stones 15 || ' + '_id: '+obj._id+' || Size: '+size+'B -> '+Math.round(size/(1024))+'KB -> '+Math.round(size/(1024*1024))+'MB (max 16MB)');
+}
+
+use fmdev
+db.Funnels.find({Name:"Stones 14"}).forEach(function(obj){ printsize(obj) });
