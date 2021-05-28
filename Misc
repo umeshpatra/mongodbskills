@@ -1,3 +1,138 @@
 db.BenefitType.find().forEach(function(d){db.getSiblingDB('fmdev')['BenefitType'].insert(d);
 });
 
+Date Comparision (greaterthan, lessthan, equalto) :
+db.getCollection('FunnelHistories').find({UpdateDate:{$gt:new ISODate("2019-06-30")}})
+
+Find the collection with array has atleast 1 or more element -
+db.getCollection(‘'FunnelHistories'’).find({‘CacheIndex.PipDataList.1': {$exists: true}})
+
+Find the collection with not null element -
+db.getCollection('Funnels').find({"Metadata.Projects":{$ne:null}})
+
+Create Another filtered Collection from main collection
+db.getCollection('Funnels').aggregate([ { $match: { _id: ObjectId("5bffac735ec59f17f09e3c5f") } }
+,{ $out: "subset" } ]);
+db.getCollection('subset').find({});
+
+Find Collections with Projected columns (both include and exclude)
+db.getCollection('Funnels').find({Name:/umeshtest/},{Name:1, FunnelStatus:1, _id:0})
+
+The $elemMatch operator limits the contents of an <array> field from the query results to contain only the first element matching the $elemMatch condition.
+db.schools.find( { zipcode: "63109" },
+                 { students: { $elemMatch: { school: 102, age: { $gt: 10} } } } )
+
+Here, $slice selects the first five items in an array in the comments field (-5 or +5 decides top or buttom).
+ db.posts.find( {}, { comments: { $slice: -5 } } )
+
+Update document Property partial/conditional
+db.getCollection('Funnelsv2').update({_id:ObjectId("5bffac735ec59f17f09e3c5f")},
+{$set: {PipDataList:[]}})
+
+Group by and having and sort
+db.getCollection('UserAccessLog').aggregate([
+  {$group : { _id : "$Username", count: { $sum: 1 }}},     
+    {$match: { "count": { $gte: 0 } }},
+  {$sort :{count:-1}}
+])
+
+Distinct Ids
+db.getCollection('Funnelsv2').distinct('PipDataList._id')
+
+,{
+$project: {
+     _id: {
+       $toString: "$_id"
+     }
+}
+}
+
+RunCommand – Generic command for MongoDB
+db.runCommand( { find: 'Funnelsv2',projection:{ "PipDataList._id": 1}})
+
+Faster way to see the Json schema for one object instead of waiting for the entire collection to be loaded-
+db.getCollection('FunnelHistories').find({).limit(1)
+
+db.getCollection('FunnelHistories').find({"FunnelId":"5c336e865b67910ef806052b"})
+Script to find with $and, $in, Objectid -
+db.getCollection('FunnelHistories').find({$and:[
+{"CacheIndex.PipDataList":{$in:["5e206c2e29b86a616e825b21"]}},
+{"FunnelId":"5c336e865b67910ef806052b"},
+{"_id":ObjectId("5e415759e546df2208d04005")},
+{"UpdatedData.PipDataList._id":"5e206c2eb09c7cf6bc9effa3"}
+]})
+db.getCollection('ThemeOfficeHistories').find({$and:
+    [{"UpdatedData._id":ObjectId("5e29f9cb99525b2420a38df8")},
+    {UpdateDate:{$gt:new ISODate("2020-04-01")}}]});    
+db.getCollection('FunnelHistories').find({$and:[
+{"CacheIndex.PipDataList":{$in:["5e206c2e29b86a616e825b21"]}},
+{"FunnelId":"5c336e865b67910ef806052b"},
+{"_id":ObjectId("5e415759e546df2208d04005")}
+]})
+Focus to a specific recordset :
+db.getCollection('FunnelHistories').find({"UpdatedData.Name":/2019 Onshore Well Abandonments/}).skip(270).limit(20)
+
+"{'$match' : {\r\n                'FunnelId' : '5bfc73eb04faf11ab8bf65f2', \r\n                'Changes.Field' : { \"$regex\" : \"5bfc776e559e607f54208111\" },\r\n            }}"
+
+db.getCollection('ThemeOfficeHistories')
+.find({$and:[{"UpdatedData._id":ObjectId("5e29f9cb99525b2420a38df8")},
+{UpdateDate:{$gt:new ISODate("2020-04-01")}}]}).sort({UpdateDate:-1}).limit(10)
+
+db.getCollection('ThemeOfficeHistories')
+.find({$and:[{"UpdatedData._id":ObjectId("5e29f9cb99525b2420a38df8")},
+{UpdateDate:{$gt:new ISODate("2020-04-01")}}]},
+{"UpdatedData.Name":1,UpdateDate:1,"UpdatedData.PipDataList":1}
+).sort({UpdateDate:-1}).limit(10)
+
+db.getCollection('ThemeOfficeHistories')
+.find({$and:[{"UpdatedData._id":ObjectId("5e29f9cb99525b2420a38df8")},
+{UpdateDate:{$gt:new ISODate("2020-04-10")}},
+{UpdateDate:{$lt:new ISODate("2020-04-18")}},
+{"UpdatedData.PipDataList.108":{$exists:true}}]}
+).sort({UpdateDate:-1})
+
+db.getCollection('ThemeOfficeHistories')
+.find({$or:[{"UpdatedData.PipDataList._id":ObjectId("5e83b413e8099faefe123a9b")},
+{"UpdatedData.PipDataList._id":ObjectId("5e83b6e2d0d37d5ab7527b04")},
+{"UpdatedData.PipDataList._id":ObjectId("5e79380720650e3af3630688")},
+{"UpdatedData.PipDataList._id":ObjectId("5e83b420c2893405a3d3b7a4")},
+{"UpdatedData.PipDataList._id":ObjectId("5ea0b124aa5da760176a966b")}]}
+).count()
+
+db.getCollection('ThemeOfficeHistories')
+.find({$and:[{UpdateDate:{$gt:new ISODate("2020-04-02")}},
+{"UpdatedData.PipDataList._id":{$in:["5e83b6e2d0d37d5ab7527b04",
+    "5e83b413e8099faefe123a9b", "5e79380720650e3af3630688",
+    "5e83b420c2893405a3d3b7a4"]}}
+]},
+{"UpdatedData.Name":1,
+    "UpdatedData.PipDataList.Title":1,
+  "UpdatedData.PipDataList._id":1,
+    "UpdatedData.UpdateBy":1,
+    UpdateDate:1}).sort({UpdateDate:-1})
+
+Pulling Data Theme History Collection
+db.getCollection('ThemeOfficeHistories')
+.find({$and:[{UpdateDate:{$gt:new ISODate("2020-04-01 23:00:00")}},
+{UpdateDate:{$lt:new ISODate("2020-04-10 23:00:00")}},
+{"UpdatedData._id":ObjectId("5e29f9cb99525b2420a38df8")},
+       {"UpdatedData.UpdateBy":"hector.romero@shell.com"}
+]},
+{"UpdatedData.Name":1,"UpdatedData._id":1,    
+    "UpdatedData.PipDataList.Title":1,
+  "UpdatedData.PipDataList._id":1,
+    "UpdatedData.UpdateBy":1,
+   UpdateDate:1}).sort({UpdateDate:-1})
+
+db.getCollection('ThemeOffices').find({$and : [{'PipDataList.MaturityLevel':'L5 - Shopping List'},
+{$or :[{'PipDataList.Allocator.Funnels.1': {$exists: true}},
+{'PipDataList.Allocator.Projects.1': {$exists: true}}
+]}]})
+Remove MongoDB  specific document and properties :
+db.getCollection('Funnels').update({Name:/21oct/},{$set:{PipDataList:[]}})
+mongo  "mongodb://<uame>:<pwd>@sww-weis-dev.shell.com:27456/fmdev?authSource=admin" C:\Users\umesh.patra\Desktop\ThematicfunnelDist.js
+mongo  hostname:port --username <uame> --password <pwd> --db fmdev < C:\Users\umesh.patra\Desktop\ThematicfunnelDist.js
+
+mongo  “mongodb://localhost:27017/fmdev” < C:\Users\umesh.patra\Desktop\JavascriptSample.js
+
+
