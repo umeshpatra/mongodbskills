@@ -1,0 +1,3 @@
+db.BenefitType.find().forEach(function(d){db.getSiblingDB('fmdev')['BenefitType'].insert(d);
+});
+
